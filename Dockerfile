@@ -17,7 +17,7 @@ COPY angle/egl.pc /usr/x86_64-w64-mingw32/sys-root/mingw/lib/pkgconfig/
 COPY angle/glesv2.pc /usr/x86_64-w64-mingw32/sys-root/mingw/lib/pkgconfig/
 COPY WinHv*.h /usr/x86_64-w64-mingw32/sys-root/mingw/include/
 
-RUN git clone https://github.com/anholt/libepoxy && \
+RUN git clone https://github.com/anholt/libepoxy.git && \
     export NOCONFIGURE=1; \
     cd libepoxy && \
     ./autogen.sh; \
@@ -25,8 +25,8 @@ RUN git clone https://github.com/anholt/libepoxy && \
     make -j2 && \
     make install
 
-RUN git clone https://github.com/matthias-prangl/SDL-mirror/ && \
-    cd SDL-mirror && \ 
+RUN git clone https://github.com/libsdl-org/SDL.git && \
+    cd SDL && \ 
     mingw64-configure && \
     make -j2 && \
     make install
