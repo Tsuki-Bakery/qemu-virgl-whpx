@@ -27,7 +27,8 @@ RUN dnf update -y && \
                 mingw64-meson \
                 mingw64-cmake \
                 cmake \
-                ccache
+                ccache \
+                diffutils    # Add this package for the cmp command
 
 # Set up ccache
 ENV PATH="/usr/lib/ccache:${PATH}"
@@ -54,20 +55,25 @@ RUN git clone https://github.com/matthias-prangl/virglrenderer.git && \
 
 RUN git clone https://github.com/matthias-prangl/qemu.git && \
     cd qemu && \
+    sed -i 's/SDL_SetHint(SDL_HINT_ANGLE_BACKEND, "d3d11");/#ifdef SDL_HINT_ANGLE_BACKEND\n            SDL_SetHint(SDL_HINT_ANGLE_BACKEND, "d3d11");\n#endif/' ui/sdl2.c && \
+    sed -i 's/SDL_SetHint(SDL_HINT_ANGLE_FAST_PATH, "1");/#ifdef SDL_HINT_ANGLE_FAST_PATH\n            SDL_SetHint(SDL_HINT_ANGLE_FAST_PATH, "1");\n#endif/' ui/sdl2.c && \
     export NOCONFIGURE=1 && \
     ./configure --target-list=x86_64-softmmu \
-    --prefix=/qemu_win \
+    --prefix="${OUTPUT_DIR}" \    
     --cross-prefix=x86_64-w64-mingw32- \    
     --enable-whpx \
     --enable-virglrenderer \
     --enable-opengl \
     --enable-debug \
     --disable-stack-protector \
+    --disable-werror \
     --enable-sdl && \
     make -j${BUILD_JOBS} && make install
 
-# Copy required libraries to output directory
+# Add a step to copy the built binaries to the output directory
 RUN mkdir -p ${OUTPUT_DIR}/bin && \
+    cp /qemu_win/*.exe ${OUTPUT_DIR}/bin/ || true && \
+    cp /qemu_win/x86_64-softmmu/*.exe ${OUTPUT_DIR}/bin/ || true && \
     cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/*.dll ${OUTPUT_DIR}/bin/ || true
 
 # Create a script to copy files to the mounted volume
