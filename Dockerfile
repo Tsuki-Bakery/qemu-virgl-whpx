@@ -5,7 +5,7 @@ ARG OUTPUT_DIR=/output
 ENV OUTPUT_DIR=${OUTPUT_DIR}
 
 # Set optimal number of build jobs based on available cores
-ENV BUILD_JOBS=$(nproc)
+ENV BUILD_JOBS=4
 
 RUN dnf update -y && \
     dnf install -y mingw64-gcc \
@@ -41,7 +41,7 @@ COPY WinHv*.h /usr/x86_64-w64-mingw32/sys-root/mingw/include/
 RUN git clone https://github.com/anholt/libepoxy.git && \
     cd libepoxy && \
     mingw64-meson builddir -Dtests=false -Degl=yes -Dglx=no -Dx11=false && \
-    ninja -C builddir -j${BUILD_JOBS} && \
+    ninja -C builddir -j4 && \
     ninja -C builddir install
 
 RUN git clone https://github.com/matthias-prangl/virglrenderer.git && \
