@@ -17,6 +17,7 @@ RUN dnf update -y && \
                 flex \
                 bison \
                 python \
+                python3-pyyaml \
                 autoconf \
                 automake \
                 libtool \
@@ -28,7 +29,7 @@ RUN dnf update -y && \
                 mingw64-cmake \
                 cmake \
                 ccache \
-                diffutils    # Add this package for the cmp command
+                diffutils
 
 # Set up ccache
 ENV PATH="/usr/lib/ccache:${PATH}"
@@ -45,15 +46,14 @@ RUN git clone https://github.com/anholt/libepoxy.git && \
     ninja -C builddir -j4 && \
     ninja -C builddir install
 
-RUN git clone https://github.com/matthias-prangl/virglrenderer.git && \
+# Updated virglrenderer build using Meson instead of autotools
+RUN git clone https://gitlab.freedesktop.org/virgl/virglrenderer.git && \
     cd virglrenderer && \
-    export NOCONFIGURE=1 && \
-    ./autogen.sh && \
-    mingw64-configure --disable-egl && \
-    make -j${BUILD_JOBS} && \
-    make install
+    mingw64-meson build/ -Dplatforms=egl -Dminigbm_allocation=false && \
+    ninja -C build -j${BUILD_JOBS} && \
+    ninja -C build install
 
-RUN git clone https://github.com/matthias-prangl/qemu.git && \
+RUN git clone https://github.com/qemu/qemu.git && \
     cd qemu && \
     sed -i 's/SDL_SetHint(SDL_HINT_ANGLE_BACKEND, "d3d11");/#ifdef SDL_HINT_ANGLE_BACKEND\n            SDL_SetHint(SDL_HINT_ANGLE_BACKEND, "d3d11");\n#endif/' ui/sdl2.c && \
     sed -i 's/SDL_SetHint(SDL_HINT_ANGLE_FAST_PATH, "1");/#ifdef SDL_HINT_ANGLE_FAST_PATH\n            SDL_SetHint(SDL_HINT_ANGLE_FAST_PATH, "1");\n#endif/' ui/sdl2.c && \
@@ -72,8 +72,8 @@ RUN git clone https://github.com/matthias-prangl/qemu.git && \
 
 # Add a step to copy the built binaries to the output directory
 RUN mkdir -p ${OUTPUT_DIR}/bin && \
-    cp /qemu_win/*.exe ${OUTPUT_DIR}/bin/ || true && \
-    cp /qemu_win/x86_64-softmmu/*.exe ${OUTPUT_DIR}/bin/ || true && \
+    cp -r ${OUTPUT_DIR}/*.exe ${OUTPUT_DIR}/bin/ || true && \
+    cp -r ${OUTPUT_DIR}/x86_64-softmmu/*.exe ${OUTPUT_DIR}/bin/ || true && \
     cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/*.dll ${OUTPUT_DIR}/bin/ || true
 
 # Create a script to copy files to the mounted volume
