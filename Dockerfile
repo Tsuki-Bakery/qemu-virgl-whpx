@@ -46,9 +46,11 @@ RUN git clone https://github.com/anholt/libepoxy.git && \
     ninja -C builddir -j4 && \
     ninja -C builddir install
 
-# Updated virglrenderer build using Meson instead of autotools
-RUN git clone https://gitlab.freedesktop.org/virgl/virglrenderer.git && \
-    cd virglrenderer && \
+# Updated virglrenderer build using direct download of release tarball
+RUN mkdir -p /virglrenderer && \
+    cd /virglrenderer && \
+    curl -L https://gitlab.freedesktop.org/virgl/virglrenderer/-/archive/1.1.1/virglrenderer-1.1.1.tar.gz -o virglrenderer.tar.gz && \
+    tar -xzf virglrenderer.tar.gz --strip-components=1 && \
     mingw64-meson build/ -Dplatforms=egl -Dminigbm_allocation=false && \
     ninja -C build -j${BUILD_JOBS} && \
     ninja -C build install
