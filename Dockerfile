@@ -11,6 +11,7 @@ RUN dnf update -y && \
     dnf install -y mingw64-gcc \
                 mingw64-glib2 \
                 mingw64-pixman \
+                mingw64-gtk3 \
                 mingw64-SDL2 \
                 git \
                 make \
@@ -66,6 +67,7 @@ RUN git clone https://github.com/qemu/qemu.git && \
     --enable-whpx \
     --enable-virglrenderer \
     --enable-opengl \
+    --enable-gtk \
     --enable-debug \
     --disable-stack-protector \
     --disable-werror \
