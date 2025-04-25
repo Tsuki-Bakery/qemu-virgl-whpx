@@ -34,9 +34,9 @@ Extract the built files to your local machine:
    docker run --rm -v "$(pwd)/output:/mnt/output" qemu-virgl-win-cross
    ```
 
-Find and copy `d3dcompiler_47.dll` file to the `output/bin` directory. You can find this DLL file in most Chromium web browser binary directory, for example with Google Chrome: 
+Find and copy `d3dcompiler_47.dll` file to the `output\bin` directory. You can find this DLL file in most Chromium web browsers binary directory, or from System32: 
 
-```"C:\Program Files\Google\Chrome\Application\<current_version>\d3dcompiler_47.dll"```
+```C:\Windows\System32\D3DCompiler_47.dll```
 
 > [!TIP]
 > You can use the same prebuilt binaries we use for testing at [Releases](https://github.com/Tsuki-Bakery/qemu-virgl-winhost/releases).
@@ -78,7 +78,7 @@ Linux guests have excellent 3D acceleration support with VirGL, often better tha
 
 Install a Linux distribution:
    ```
-    ./output/qemu-system-x86_64w.exe `
+    .\output\qemu-system-x86_64w.exe `
     -M q35 `
     -m 4G `
     -smp 4 `
@@ -109,7 +109,7 @@ For optimal Linux guest experience:
 
 With ISO file for Windows setup installation:
    ```
-    ./output/qemu-system-x86_64.exe `
+    .\output\qemu-system-x86_64.exe `
     -M q35 `
     -m 4G `
     -smp 4 `
