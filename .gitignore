@@ -1,0 +1,10 @@
+# Remnant of previous repo
+.DS_Store
+
+# Output build
+output/
+
+# We don't want trouble from Microsoft
+WinHv*.h
+d3dcompiler_47.dll
+*.zip

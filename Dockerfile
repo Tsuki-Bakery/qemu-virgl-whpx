@@ -4,9 +4,6 @@ FROM fedora:latest
 ARG OUTPUT_DIR=/output
 ENV OUTPUT_DIR=${OUTPUT_DIR}
 
-# Set optimal number of build jobs based on available cores
-ENV BUILD_JOBS=4
-
 RUN dnf update -y && \
     dnf install -y mingw64-gcc \
                 mingw64-glib2 \
@@ -22,6 +19,7 @@ RUN dnf update -y && \
                 autoconf \
                 automake \
                 libtool \
+                libslirp \
                 pkg-config \
                 xorg-x11-util-macros \
                 meson \
@@ -41,22 +39,27 @@ COPY angle/egl.pc /usr/x86_64-w64-mingw32/sys-root/mingw/lib/pkgconfig/
 COPY angle/glesv2.pc /usr/x86_64-w64-mingw32/sys-root/mingw/lib/pkgconfig/
 COPY WinHv*.h /usr/x86_64-w64-mingw32/sys-root/mingw/include/
 
-RUN git clone https://github.com/anholt/libepoxy.git && \
+RUN git clone https://github.com/anholt/libepoxy.git --depth 1 && \
     cd libepoxy && \
     mingw64-meson builddir -Dtests=false -Degl=yes -Dglx=no -Dx11=false && \
-    ninja -C builddir -j4 && \
+    ninja -C builddir -j`nproc` && \
     ninja -C builddir install
 
-# Updated virglrenderer build using direct download of release tarball
-RUN mkdir -p /virglrenderer && \
-    cd /virglrenderer && \
+RUN mkdir -p virglrenderer && \
+    cd virglrenderer && \
     curl -L https://gitlab.freedesktop.org/virgl/virglrenderer/-/archive/1.1.1/virglrenderer-1.1.1.tar.gz -o virglrenderer.tar.gz && \
     tar -xzf virglrenderer.tar.gz --strip-components=1 && \
     mingw64-meson build/ -Dplatforms=egl -Dminigbm_allocation=false && \
-    ninja -C build -j${BUILD_JOBS} && \
+    ninja -C build -j`nproc` && \
     ninja -C build install
 
-RUN git clone https://github.com/qemu/qemu.git && \
+RUN git clone https://gitlab.freedesktop.org/slirp/libslirp.git --depth 1 && \
+    cd libslirp && \
+    mingw64-meson builddir && \
+    ninja -C builddir -j`nproc` && \
+    ninja -C builddir install
+
+RUN git clone https://github.com/qemu/qemu.git --depth 1 && \
     cd qemu && \
     sed -i 's/SDL_SetHint(SDL_HINT_ANGLE_BACKEND, "d3d11");/#ifdef SDL_HINT_ANGLE_BACKEND\n            SDL_SetHint(SDL_HINT_ANGLE_BACKEND, "d3d11");\n#endif/' ui/sdl2.c && \
     sed -i 's/SDL_SetHint(SDL_HINT_ANGLE_FAST_PATH, "1");/#ifdef SDL_HINT_ANGLE_FAST_PATH\n            SDL_SetHint(SDL_HINT_ANGLE_FAST_PATH, "1");\n#endif/' ui/sdl2.c && \
@@ -72,12 +75,10 @@ RUN git clone https://github.com/qemu/qemu.git && \
     --disable-stack-protector \
     --disable-werror \
     --enable-sdl && \
-    make -j${BUILD_JOBS} && make install
+    make -j`nproc` && make install
 
 # Add a step to copy the built binaries to the output directory
 RUN mkdir -p ${OUTPUT_DIR}/bin && \
-    cp -r ${OUTPUT_DIR}/*.exe ${OUTPUT_DIR}/bin/ || true && \
-    cp -r ${OUTPUT_DIR}/x86_64-softmmu/*.exe ${OUTPUT_DIR}/bin/ || true && \
     cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/*.dll ${OUTPUT_DIR}/bin/ || true
 
 # Create a script to copy files to the mounted volume
