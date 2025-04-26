@@ -1,4 +1,4 @@
-# QEMU with ANGLE-accelerated VirGL for Windows
+# QEMU with ANGLE-accelerated VirGL for Windows host
 
 This project provides a Docker-based build system for cross-compiling QEMU for Windows x86_64 hosts with WHPX (Windows Hypervisor Platform) support, so is intended for use on Windows hosts with any Microsoft virtualization service enabled (WSL2, Virtualization-based Security, Hyper-V, etc.).
 
@@ -71,6 +71,7 @@ Preferably create a new folder per guest for easier management.
 - `-accel whpx,kernel-irqchip=off`: enable WHPX virtualization accelerator (Recommended).
 - `-netdev user,id=anet0 -device virtio-net-pci,netdev=anet0`: enable Internet access for guest (Recommended).
 - `-usb -device usb-tablet`: better mouse integration (Recommended).
+- `-device intel-hda -device hda-duplex`: enable emulated sound device for playing guest audio to host.
 
 ### GNU/Linux guests
 
@@ -85,6 +86,7 @@ Install a Linux distribution:
     -accel whpx,kernel-irqchip=off `
     -netdev user,id=anet0 -device virtio-net-pci,netdev=anet0 `
     -usb -device usb-tablet `
+    -device intel-hda -device hda-duplex
     -cdrom ubuntu.iso `
     -drive file=.\ubuntu-disk.qcow2,if=virtio `
     -device virtio-vga-gl `
@@ -104,8 +106,22 @@ For optimal Linux guest experience:
 - 3D applications and desktop environments will automatically use hardware acceleration without further configuration.
 
 ### Windows guests
+
+> [!CAUTION]
+> Windows guest support is considered very immature at the meantime.
+> The following guide is quick start guide for participating developers and some notes what we have done and learned so far.
+
+What works:
+- Windows 10 and below (testing was done with Windows 10 Enterprise IoT LTSC 2021).
+- Basic 2D graphics via Red Hat VirtIO GPU DOD controller/QXL driver. Removing `-device virtio-vga-gl` and `,gl=on` improves performance.
+
+What doesn't work:
+- Windows 11 just crashes with error of `WHPX: Unexpected VP exit code 4`, we suspect it checks for nested virtualization (for Virtualization-based security). Being tracked on [this issue](https://gitlab.com/qemu-project/qemu/-/issues/2461).
+- 3D accelerated graphics due to WIP VirtIO GPU driver.
+- Restart ends up WHPX crashing of `WHPX: Unexpected VP exit code 4` as well. Shut down takes a while.
+
 > [!NOTE]
-> For Windows guests, you'll need to install VirtIO GPU drivers from the [VirtIO drivers ISO](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/).
+> For Windows guests, you'll need VirtIO GPU drivers and guest helper from the [VirtIO drivers ISO](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/). Keep it mounted as a `-cdrom` device helps your development a lot.
 
 With ISO file for Windows setup installation:
    ```
@@ -113,28 +129,22 @@ With ISO file for Windows setup installation:
     -M q35 `
     -m 4G `
     -smp 4 `
-    -accel whpx,kernel-irqchip=off `
+    -accel whpx`
     -netdev user,id=anet0 -device virtio-net-pci,netdev=anet0 `
+    -device intel-hda -device hda-duplex
     -usb -device usb-tablet `
     -cdrom windows.iso `
     -hda windows-disk.qcow2 `
-    -device virtio-vga-gl `
-    -display sdl,gl=on
+    -display sdl
    ```
 
-After installation, you can remove `-cdrom windows.iso` option.
+> [!NOTE]
+> Remove `-device virtio-vga-gl` from launch options until you have installed all VirtIO drivers and guest tools after OOBE setup.
 
-~~Alternatively, you can explicitly use OpenGL ES for ANGLE: `-display sdl,gl=es`~~ Currently not working well, will crash. 
+> [!TIP]
+> You can potentially improve disk I/O performance by replacing `-hda windows-disk.qcow2` with `-drive file=.\windows-disk.qcow2,if=virtio` and load drivers from `<virtio-win-disk>:\amd64\<your-windows-version>`.
 
-## Troubleshooting
-
-### Can't file some QEMU library DLL files
-We're addressing this issue. For now, run this every time you open Powershell:
-
-```
-$env:Path += ';C:\path\to\qemu\output\bin'
-```
-or edit user path, if you don't mind.
+After installation, you can remove `-cdrom windows.iso` option and run `virtio-win-guest-tools.exe` installation file in VirtIO drivers ISO file.
 
 ## How to Contribute
 
