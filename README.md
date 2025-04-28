@@ -1,26 +1,29 @@
 # QEMU with ANGLE-accelerated VirGL for Windows host
 
-This project provides a Docker-based build system for cross-compiling QEMU for Windows x86_64 hosts with WHPX (Windows Hypervisor Platform) support, so is intended for use on Windows hosts with any Microsoft virtualization service enabled (WSL2, Virtualization-based Security, Hyper-V, etc.).
+This project provides a Docker-based build system for cross-compiling QEMU for Windows x86_64 hosts with WHPX (Windows Hypervisor Platform) acclerator support, so is intended for use on Windows hosts with any Microsoft virtualization service enabled (WSL2, Virtualization-based Security, Hyper-V, etc.).
 
 It enables 3D acclerated graphics for guests with ANGLE through VirGL so you don't need any further setup or configuration for GPU.
 
+Due to limitation to WHPX accelerator, only x86_64 (amd64) guest is supported.
+
 > [!IMPORTANT]
 > This project is still very experimental and is not suitable for any production use.
+
+## Download
+
+Latest binaries build is offered at [Releases page](https://github.com/Tsuki-Bakery/qemu-virgl-whpx/releases) upon commit.
+
+> [!IMPORTANT]
+> Due to potential licensing problems, we can't include file d3dcompiler_47.dll (which is needed to compile Direct3D shaders for ANGLE) for now.
+
+Find and copy `d3dcompiler_47.dll` file to the extracted binaries directory (same level as `qemu*.exe` files). You can find this DLL file in most Chromium web browsers binary directory, or from System32: 
+
+```C:\Windows\System32\D3DCompiler_47.dll```
 
 ## Building
 
 ### Using Docker
 
-> [!NOTE]  
-> Due to potential licensing problems, we can't include source code and DLL (Dynamic-link library) files for now. You will need to manually find and copy those files by following guidance in this guide.
-
-To build QEMU with WHPX (Windows Hypervisor Platform) support, the following headers from the Windows SDK are required:
-
-- WinHvEmulation.h
-- WinHvPlatform.h
-- WinHvPlatformDefs.h
-
-These headers are typically located at `C:\Program Files (x86)\Windows Kits\10\Include\<your_windows_version>\um` and should be copied to the root directory of this project (same level with Dockerfile).
 
 Build the Docker image and load it into the local registry:
    ```bash
@@ -34,14 +37,8 @@ Extract the built files to your local machine:
    docker run --rm -v "$(pwd)/output:/mnt/output" qemu-virgl-win-cross
    ```
 
-Find and copy `d3dcompiler_47.dll` file to the `output\bin` directory. You can find this DLL file in most Chromium web browsers binary directory, or from System32: 
-
-```C:\Windows\System32\D3DCompiler_47.dll```
-
-> [!TIP]
-> You can use the same prebuilt binaries we use for testing at [Releases](https://github.com/Tsuki-Bakery/qemu-virgl-winhost/releases).
-> You will still need (only) to copy `d3dcompiler_47.dll` file to the `output/bin` directory on yourself.
-> We're also planning to setup GitHub Actions for automated builds.
+> [!IMPORTANT]
+> You will also need to find and copy `d3dcompiler_47.dll` file within `qemu*.exe` files as guided in [Download](#Download) section.
 
 ## Usage
 
@@ -79,7 +76,7 @@ Linux guests have excellent 3D acceleration support with VirGL, often better tha
 
 Install a Linux distribution:
    ```
-    .\output\qemu-system-x86_64w.exe `
+    qemu-system-x86_64.exe `
     -M q35 `
     -m 4G `
     -smp 4 `
@@ -125,7 +122,7 @@ What doesn't work:
 
 With ISO file for Windows setup installation:
    ```
-    .\output\qemu-system-x86_64.exe `
+    qemu-system-x86_64.exe `
     -M q35 `
     -m 4G `
     -smp 4 `
@@ -148,9 +145,9 @@ After installation, you can remove `-cdrom windows.iso` option and run `virtio-w
 
 ## How to Contribute
 
-Feel free to open or participate in project discussions on [the issues page](https://github.com/Tsuki-Bakery/qemu-virgl-winhost/issues).
+Feel free to open or participate in project discussions on [the issues page](https://github.com/Tsuki-Bakery/qemu-virgl-whpx/issues).
 
-You may clone this repository, improve it and create a merge request, or help us to review them at [Pull requests](https://github.com/Tsuki-Bakery/qemu-virgl-winhost/pulls).
+You may clone this repository, improve it and create a merge request, or help us to review them at [Pull requests](https://github.com/Tsuki-Bakery/qemu-virgl-whpx/pulls).
 
 You can also join us to talk around this project on our [Telegram chat room](https://t.me/+Fo64cxKTGnNlZDhl).
 

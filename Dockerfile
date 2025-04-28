@@ -78,7 +78,7 @@ RUN git clone https://github.com/qemu/qemu.git --depth 1 && \
     make -j`nproc` && make install
 
 # Add a step to copy the built binaries to the output directory
-RUN cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/*.dll ${OUTPUT_DIR}/bin/ || true
+RUN cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/*.dll ${OUTPUT_DIR}/ || true
 
 # Create a script to copy files to the mounted volume
 RUN echo '#!/bin/sh' > /copy-output.sh && \
