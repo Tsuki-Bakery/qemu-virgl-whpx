@@ -95,7 +95,7 @@ jobs:
           files: qemu-virgl-whpx.zip
           tag_name: ${{ steps.bump_version.outputs.new_tag }}
           body: |
-        Changes since ${{ steps.get_latest_tag.outputs.latest_tag }}:
-        ${{ steps.generate_changelog.outputs.changelog }}
+            Changes since ${{ steps.get_latest_tag.outputs.latest_tag }}:
+            ${{ steps.generate_changelog.outputs.changelog }}
         env:  
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
