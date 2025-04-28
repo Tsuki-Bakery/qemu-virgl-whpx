@@ -14,7 +14,7 @@ Due to limitation to WHPX accelerator, only x86_64 (amd64) guest is supported.
 Latest binaries build is offered at [Releases page](https://github.com/Tsuki-Bakery/qemu-virgl-whpx/releases) upon commit.
 
 > [!IMPORTANT]
-> Due to potential licensing problems, we can't include file d3dcompiler_47.dll (which is needed to compile Direct3D shaders for ANGLE) for now.
+> Due to potential licensing problems, we can't include file `d3dcompiler_47.dll` (which is needed to compile Direct3D shaders for ANGLE) for the time being.
 
 Find and copy `d3dcompiler_47.dll` file to the extracted binaries directory (same level as `qemu*.exe` files). You can find this DLL file in most Chromium web browsers binary directory, or from System32: 
 
@@ -23,7 +23,6 @@ Find and copy `d3dcompiler_47.dll` file to the extracted binaries directory (sam
 ## Building
 
 ### Using Docker
-
 
 Build the Docker image and load it into the local registry:
    ```bash
