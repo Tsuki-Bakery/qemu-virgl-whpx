@@ -14,14 +14,6 @@ It enables 3D acclerated graphics for guests with ANGLE through VirGL so you don
 > [!NOTE]  
 > Due to potential licensing problems, we can't include source code and DLL (Dynamic-link library) files for now. You will need to manually find and copy those files by following guidance in this guide.
 
-To build QEMU with WHPX (Windows Hypervisor Platform) support, the following headers from the Windows SDK are required:
-
-- WinHvEmulation.h
-- WinHvPlatform.h
-- WinHvPlatformDefs.h
-
-These headers are typically located at `C:\Program Files (x86)\Windows Kits\10\Include\<your_windows_version>\um` and should be copied to the root directory of this project (same level with Dockerfile).
-
 Build the Docker image and load it into the local registry:
    ```bash
    # For most platforms (Linux, Windows, Intel Mac):
@@ -108,7 +100,7 @@ For optimal Linux guest experience:
 ### Windows guests
 
 > [!CAUTION]
-> Windows guest support is considered very immature at the meantime.
+> Windows guest support is considered very immature.
 > The following guide is quick start guide for participating developers and some notes what we have done and learned so far.
 
 What works:

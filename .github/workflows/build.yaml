@@ -1,0 +1,57 @@
+name: Build QEMU VirGL Windows Host
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+    # Allows manual triggering
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      
+      - name: Prepare output directory
+        run: |
+          mkdir -p output
+          chmod 777 output
+      
+      - name: Build QEMU with Docker
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          load: true
+          tags: qemu-virgl-winhost:latest
+      
+      - name: Extract build artifacts
+        run: |
+          docker run --rm -v ${{ github.workspace }}/output:/mnt/output qemu-virgl-winhost:latest
+      
+      - name: Create ZIP archive
+        run: |
+          cd output
+          zip -r ../qemu-virgl-winhost.zip .
+      
+      - name: Upload ZIP artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: qemu-virgl-winhost
+          path: qemu-virgl-winhost.zip
+          
+      - name: Create Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: qemu-virgl-winhost.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

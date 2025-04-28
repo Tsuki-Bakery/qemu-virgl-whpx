@@ -37,7 +37,6 @@ ENV CCACHE_DIR="/ccache"
 COPY angle/include/ /usr/x86_64-w64-mingw32/sys-root/mingw/include/
 COPY angle/egl.pc /usr/x86_64-w64-mingw32/sys-root/mingw/lib/pkgconfig/
 COPY angle/glesv2.pc /usr/x86_64-w64-mingw32/sys-root/mingw/lib/pkgconfig/
-COPY WinHv*.h /usr/x86_64-w64-mingw32/sys-root/mingw/include/
 
 RUN git clone https://github.com/anholt/libepoxy.git --depth 1 && \
     cd libepoxy && \
