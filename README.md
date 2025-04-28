@@ -1,24 +1,17 @@
 # QEMU with ANGLE-accelerated VirGL for Windows host
 
+> [!CAUTION]
+> This project is still very experimental and is not suitable for any production use.
+
 This project provides a Docker-based build system for cross-compiling QEMU for Windows x86_64 hosts with WHPX (Windows Hypervisor Platform) acclerator support, so is intended for use on Windows hosts with any Microsoft virtualization service enabled (WSL2, Virtualization-based Security, Hyper-V, etc.).
 
 It enables 3D acclerated graphics for guests with ANGLE through VirGL so you don't need any further setup or configuration for GPU.
 
 Due to limitation to WHPX accelerator, only x86_64 (amd64) guest is supported.
 
-> [!IMPORTANT]
-> This project is still very experimental and is not suitable for any production use.
-
 ## Download
 
 Latest binaries build is offered at [Releases page](https://github.com/Tsuki-Bakery/qemu-virgl-whpx/releases) upon commit.
-
-> [!IMPORTANT]
-> Due to potential licensing problems, we can't include file `d3dcompiler_47.dll` (which is needed to compile Direct3D shaders for ANGLE) for the time being.
-
-Find and copy `d3dcompiler_47.dll` file to the extracted binaries directory (same level as `qemu*.exe` files). You can find this DLL file in most Chromium web browsers binary directory, or from System32: 
-
-```C:\Windows\System32\D3DCompiler_47.dll```
 
 ## Building
 
@@ -27,13 +20,13 @@ Find and copy `d3dcompiler_47.dll` file to the extracted binaries directory (sam
 Build the Docker image and load it into the local registry:
    ```bash
    # For most platforms (Linux, Windows, Intel Mac):
-   docker build -t qemu-virgl-win-cross .
+   docker build -t qemu-virgl-whpx .
    ```
 
 Extract the built files to your local machine:
    ```bash
    mkdir -p ./output
-   docker run --rm -v "$(pwd)/output:/mnt/output" qemu-virgl-win-cross
+   docker run --rm -v "$(pwd)/output:/mnt/output" qemu-virgl-whpx
    ```
 
 > [!IMPORTANT]
