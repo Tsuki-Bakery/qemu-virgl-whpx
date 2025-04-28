@@ -3,6 +3,7 @@ name: Build QEMU VirGL Windows Host
 on:
   push:
     branches: [ main, master ]
+    tags: ['v*']
   pull_request:
     branches: [ main, master ]
   workflow_dispatch:
@@ -31,27 +32,70 @@ jobs:
           file: ./Dockerfile
           push: false
           load: true
-          tags: qemu-virgl-winhost:latest
+          tags: qemu-virgl-whpx:latest
       
       - name: Extract build artifacts
         run: |
-          docker run --rm -v ${{ github.workspace }}/output:/mnt/output qemu-virgl-winhost:latest
+          docker run --rm -v ${{ github.workspace }}/output:/mnt/output qemu-virgl-whpx:latest
       
       - name: Create ZIP archive
         run: |
           cd output
-          zip -r ../qemu-virgl-winhost.zip .
+          zip -r ../qemu-virgl-whpx.zip .
       
       - name: Upload ZIP artifact
         uses: actions/upload-artifact@v4
         with:
-          name: qemu-virgl-winhost
-          path: qemu-virgl-winhost.zip
+          name: qemu-virgl-whpx
+          path: qemu-virgl-whpx.zip
           
+      - name: Get latest tag
+        id: get_latest_tag
+        run: |
+          git fetch --tags
+          LATEST_TAG=$(git tag -l 'v*' | sort -V | tail -n1)
+          if [ -z "$LATEST_TAG" ]; then
+            LATEST_TAG="v0.0.0"
+          fi
+          echo "latest_tag=${LATEST_TAG}" >> $GITHUB_OUTPUT
+
+      - name: Bump version
+        id: bump_version
+        run: |
+          LATEST_TAG="${{ steps.get_latest_tag.outputs.latest_tag }}"
+          MAJOR=$(echo $LATEST_TAG | sed 's/v\([0-9]*\)\.\([0-9]*\)\.\([0-9]*\)/\1/')
+          MINOR=$(echo $LATEST_TAG | sed 's/v\([0-9]*\)\.\([0-9]*\)\.\([0-9]*\)/\2/')
+          PATCH=$(echo $LATEST_TAG | sed 's/v\([0-9]*\)\.\([0-9]*\)\.\([0-9]*\)/\3/')
+          NEW_PATCH=$((PATCH + 1))
+          NEW_TAG="v${MAJOR}.${MINOR}.${NEW_PATCH}"
+          echo "new_tag=${NEW_TAG}" >> $GITHUB_OUTPUT
+
+      - name: Create new tag
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git tag -a ${{ steps.bump_version.outputs.new_tag }} -m "Auto-generated tag ${{ steps.bump_version.outputs.new_tag }}"
+          git push origin ${{ steps.bump_version.outputs.new_tag }}
+
+      - name: Generate changelog
+        id: generate_changelog
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          LATEST_TAG="${{ steps.get_latest_tag.outputs.latest_tag }}"
+          CHANGELOG=$(git log --pretty=format:"- %s" ${LATEST_TAG}..HEAD)
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
       - name: Create Release
-        if: github.ref_type == 'tag'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          files: qemu-virgl-winhost.zip
-        env:
+          files: qemu-virgl-whpx.zip
+          tag_name: ${{ steps.bump_version.outputs.new_tag }}
+          body: |
+        Changes since ${{ steps.get_latest_tag.outputs.latest_tag }}:
+        ${{ steps.generate_changelog.outputs.changelog }}
+        env:  
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

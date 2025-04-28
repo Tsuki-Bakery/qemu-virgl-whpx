@@ -31,7 +31,7 @@ Find and copy `d3dcompiler_47.dll` file to the `output\bin` directory. You can f
 ```C:\Windows\System32\D3DCompiler_47.dll```
 
 > [!TIP]
-> You can use the same prebuilt binaries we use for testing at [Releases](https://github.com/Tsuki-Bakery/qemu-virgl-winhost/releases).
+> You can use the same prebuilt binaries we use for testing at [Releases](https://github.com/Tsuki-Bakery/qemu-virgl-whpx/releases).
 > You will still need (only) to copy `d3dcompiler_47.dll` file to the `output/bin` directory on yourself.
 > We're also planning to setup GitHub Actions for automated builds.
 
@@ -140,9 +140,9 @@ After installation, you can remove `-cdrom windows.iso` option and run `virtio-w
 
 ## How to Contribute
 
-Feel free to open or participate in project discussions on [the issues page](https://github.com/Tsuki-Bakery/qemu-virgl-winhost/issues).
+Feel free to open or participate in project discussions on [the issues page](https://github.com/Tsuki-Bakery/qemu-virgl-whpx/issues).
 
-You may clone this repository, improve it and create a merge request, or help us to review them at [Pull requests](https://github.com/Tsuki-Bakery/qemu-virgl-winhost/pulls).
+You may clone this repository, improve it and create a merge request, or help us to review them at [Pull requests](https://github.com/Tsuki-Bakery/qemu-virgl-whpx/pulls).
 
 You can also join us to talk around this project on our [Telegram chat room](https://t.me/+Fo64cxKTGnNlZDhl).
 
