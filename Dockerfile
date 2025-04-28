@@ -11,6 +11,7 @@ RUN dnf update -y && \
                 mingw64-gtk3 \
                 mingw64-SDL2 \
                 git \
+                wget \
                 make \
                 flex \
                 bison \
