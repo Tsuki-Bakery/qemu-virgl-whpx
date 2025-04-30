@@ -60,7 +60,7 @@ RUN curl -L ${WINHP_HEADER_URL}/WinHvPlatform.h -o /usr/x86_64-w64-mingw32/sys-r
     curl -L ${WINHP_HEADER_URL}/WinHvPlatformDefs.h -o /usr/x86_64-w64-mingw32/sys-root/mingw/include/WinHvPlatformDefs.h && \
     curl -L ${WINHP_HEADER_URL}/WinHvEmulation.h  -o /usr/x86_64-w64-mingw32/sys-root/mingw/include/WinHvEmulation.h
 
-RUN git clone --branch main --single-branch --depth 1 https://github.com/qemu/qemu.git && \
+RUN git clone --branch master --single-branch --depth 1 https://github.com/qemu/qemu.git && \
     cd qemu && \
     sed -i 's/SDL_SetHint(SDL_HINT_ANGLE_BACKEND, "d3d11");/#ifdef SDL_HINT_ANGLE_BACKEND\n            SDL_SetHint(SDL_HINT_ANGLE_BACKEND, "d3d11");\n#endif/' ui/sdl2.c && \
     sed -i 's/SDL_SetHint(SDL_HINT_ANGLE_FAST_PATH, "1");/#ifdef SDL_HINT_ANGLE_FAST_PATH\n            SDL_SetHint(SDL_HINT_ANGLE_FAST_PATH, "1");\n#endif/' ui/sdl2.c && \
