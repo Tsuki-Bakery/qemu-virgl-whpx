@@ -82,7 +82,7 @@ RUN git clone --branch master --single-branch --depth 1 https://github.com/qemu/
 RUN cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/*.dll ${OUTPUT_DIR}/ && \
     curl -L https://raw.githubusercontent.com/mozilla/fxc2/master/dll/d3dcompiler_47.dll -o ${OUTPUT_DIR}/d3dcompiler_47.dll && \
     curl -L https://archlinux.org/packages/extra/any/edk2-ovmf/download/ -o edk2-ovmf.tar.zst && \
-    tar --zstd -xvf firmware.tar.zst --wildcards 'usr/share/edk2/*' --transform='s|^usr/share|${OUTPUT_DIR}/share|' 
+    tar --zstd -xvf edk2-ovmf.tar.zst --wildcards 'usr/share/edk2/*' --transform='s|^usr/share|${OUTPUT_DIR}/share|' 
 
 RUN echo '#!/bin/sh' > /copy-output.sh && \
     echo 'cp -r ${OUTPUT_DIR}/* /mnt/output/' >> /copy-output.sh && \
