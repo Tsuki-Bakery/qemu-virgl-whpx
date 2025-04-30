@@ -3,7 +3,7 @@
 > [!CAUTION]
 > This project is still very experimental and is not suitable for any production use.
 
-This project provides a Docker-based build system for cross-compiling QEMU for Windows x86_64 hosts with WHPX (Windows Hypervisor Platform) acclerator support, so is intended for use on Windows hosts with any Microsoft virtualization service enabled (WSL2, Virtualization-based Security, Hyper-V, etc.).
+This project provides a Docker-based build system for cross-compiling QEMU for Windows x86_64 hosts with WHPX (Windows Hypervisor Platform) accelerator support, so is intended for use on Windows hosts with any Microsoft virtualization service enabled (WSL2, Virtualization-based Security, Hyper-V, etc.).
 
 It enables 3D acclerated graphics for guests with ANGLE through VirGL so you don't need any further setup or configuration for GPU.
 
@@ -28,9 +28,6 @@ Extract the built files to your local machine:
    mkdir -p ./output
    docker run --rm -v "$(pwd)/output:/mnt/output" qemu-virgl-whpx
    ```
-
-> [!IMPORTANT]
-> You will also need to find and copy `d3dcompiler_47.dll` file within `qemu*.exe` files as guided in [Download](#Download) section.
 
 ## Usage
 
